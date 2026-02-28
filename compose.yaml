@@ -1,0 +1,7 @@
+﻿services:
+  cookify.api:
+    image: cookify.api
+    build:
+      context: .
+      dockerfile: Cookify.Api/Dockerfile
+
