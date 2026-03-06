@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Identity;
 
 namespace Cookify.Api.Model;
 
+
 public class User : IdentityUser
 {
-    public required string Username { get; set; }
+    public string Username { get; set; } = string.Empty;
     public string? Bio { get; set; }
     public string? UserAvatarUrl { get; set; }
 
