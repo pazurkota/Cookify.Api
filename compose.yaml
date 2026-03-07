@@ -10,6 +10,11 @@
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     restart: always
   
   cookify.api:
@@ -27,7 +32,8 @@
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: on-failure
     
 volumes:

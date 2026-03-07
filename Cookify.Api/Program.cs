@@ -18,7 +18,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
     options.UseNpgsql(connectionString);
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
@@ -46,6 +46,25 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var retries = 10;
+    for (var i = 0; i < retries; i++)
+    {
+        try
+        {
+            db.Database.Migrate();
+            break;
+        }
+        catch (Npgsql.NpgsqlException) when (i < retries - 1)
+        {
+            Console.WriteLine($"Database not ready, retrying in 3s... ({i + 1}/{retries})");
+            Thread.Sleep(3000);
+        }
+    }
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

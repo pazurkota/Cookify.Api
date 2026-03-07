@@ -10,6 +10,6 @@ public class User : IdentityUser
     public string? Bio { get; set; }
     public string? UserAvatarUrl { get; set; }
 
-    public DateTime JoinedAt { get; set; } = DateTime.Now;
+    public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
     public List<Recipe> Recipes { get; set; } = new();
 }
