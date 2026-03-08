@@ -72,7 +72,7 @@ using (var scope = app.Services.CreateScope())
         }
         catch (Npgsql.NpgsqlException) when (i < retries - 1)
         {
-            Console.WriteLine($"Database not ready, retrying in 3s... ({i + 1}/{retries})");
+            Console.WriteLine($"Failed to connect to db, retrying in 3s... ({i + 1}/{retries})");
             Thread.Sleep(3000);
         }
     }
