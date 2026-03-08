@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Cookify.Api.Controllers;
 
 public class AuthController
-    (UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService) : BaseController
+    (UserManager<User> userManager, ITokenService tokenService) : BaseController
 {
     [HttpPost("register")]
     public async Task<IActionResult> RegisterNewUser([FromBody] RegisterUserDto dto)
@@ -32,22 +32,18 @@ public class AuthController
     [HttpPost("login")]
     public async Task<IActionResult> LoginUser([FromBody] LoginUserDto dto)
     {
-        var user = await userManager.FindByEmailAsync(dto.UserLogin);
-        if (user == null) await userManager.FindByNameAsync(dto.UserLogin);
+        var user = await userManager.FindByEmailAsync(dto.UserLogin) ?? await userManager.FindByNameAsync(dto.UserLogin);
         
-        // if user wasn't found by email or login, throw 403
-        if (user == null) return Unauthorized("Invalid login or password");
+        // if user wasn't found by email or login, throw 401
+        if (user == null) return Unauthorized(new { message = "Invalid login or password" });
 
-        var result = await signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-
-        if (result.Succeeded)
-        {
-            var roles = await userManager.GetRolesAsync(user);
-            var token = tokenService.GenerateJwtToken(user, roles);
+        var result = await userManager.CheckPasswordAsync(user, dto.Password);
+        if (!result) return Unauthorized(new { message = "Invalid login or password" });
+        
+        var roles = await userManager.GetRolesAsync(user);
+        var token = tokenService.GenerateJwtToken(user, roles);
             
-            return Ok(new { AccessToken = token });
-        }
-        
-        return Unauthorized("Invalid login or password");
+        return Ok(new { AccessToken = token });
+
     }
 }
