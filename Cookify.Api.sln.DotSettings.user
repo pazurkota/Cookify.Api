@@ -1,0 +1,7 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=80f825dd_002Df089_002D4d59_002Da35a_002D3f7a0281c945/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="LoginTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::89D80B9D-0AFC-4B6D-A63F-340DBC9FCC78::net10.0::Cookify.Api.Tests.AuthTests.LoginTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::89D80B9D-0AFC-4B6D-A63F-340DBC9FCC78::net10.0::Cookify.Api.Tests.AuthTests.RegisterTest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
