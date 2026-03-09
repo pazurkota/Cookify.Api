@@ -1,8 +1,11 @@
 using System.Text;
+using Cookify.Api.Abstractions;
 using Cookify.Api.Database;
 using Cookify.Api.Model;
+using Cookify.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -23,7 +26,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
-builder.Services.AddIdentityApiEndpoints<User>()
+builder.Services.AddIdentityApiEndpoints<User>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+})
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddAuthentication(options =>
@@ -43,7 +50,12 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+});
+
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
@@ -60,7 +72,7 @@ using (var scope = app.Services.CreateScope())
         }
         catch (Npgsql.NpgsqlException) when (i < retries - 1)
         {
-            Console.WriteLine($"Database not ready, retrying in 3s... ({i + 1}/{retries})");
+            Console.WriteLine($"Failed to connect to db, retrying in 3s... ({i + 1}/{retries})");
             Thread.Sleep(3000);
         }
     }
@@ -68,8 +80,6 @@ using (var scope = app.Services.CreateScope())
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapIdentityApi<User>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -80,6 +90,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.MapControllers();
 
-app.MapGet("/health", () => "app status: working");
-
 app.Run();
+
+public partial class Program { }
