@@ -1,0 +1,48 @@
+﻿name: test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: parcelbox_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Install EF Core tools
+        run: dotnet tool install --global dotnet-ef
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore
+      - name: Verify EF Core migrations
+        run: dotnet ef database update --project ParcelBox.Api
+        env:
+          ConnectionStrings__DefaultConnection: "Host=localhost;Database=cookify_db;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }}"
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+        env:
+          ConnectionStrings__DefaultConnection: "Host=localhost;Database=cookify_db;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }}"
