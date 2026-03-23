@@ -1,4 +1,5 @@
-﻿using Cookify.Api.Abstractions;
+﻿using System.Net;
+using Cookify.Api.Abstractions;
 using Cookify.Api.Dtos;
 using Cookify.Api.Model;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +10,15 @@ namespace Cookify.Api.Controllers;
 public class AuthController
     (UserManager<User> userManager, ITokenService tokenService) : BaseController
 {
+    /// <summary>
+    /// Register a new user
+    /// </summary>
+    /// <param name="dto">The user credentials (username, email, password)</param>
+    /// <returns></returns>
     [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RegisterNewUser([FromBody] RegisterUserDto dto)
     {
         var user = new User
@@ -29,7 +38,15 @@ public class AuthController
         return BadRequest(new { Errors = errors });
     }
 
+    /// <summary>
+    /// Log the user
+    /// </summary>
+    /// <param name="dto">The user credentials (username/email and password)</param>
+    /// <returns>JWT Bearer key</returns>
     [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> LoginUser([FromBody] LoginUserDto dto)
     {
         var user = await userManager.FindByEmailAsync(dto.UserLogin) ?? await userManager.FindByNameAsync(dto.UserLogin);

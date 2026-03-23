@@ -1,10 +1,10 @@
+using System.Reflection;
 using System.Text;
 using Cookify.Api.Abstractions;
 using Cookify.Api.Database;
 using Cookify.Api.Model;
 using Cookify.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +18,11 @@ var key = Encoding.ASCII.GetBytes(jwtKey);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "ParcelBox.Api.xml"));
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -59,8 +64,12 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+var entryAssembleName = Assembly.GetEntryAssembly()?.GetName().Name ?? string.Empty;
+
+if (entryAssembleName != "dotnet-swagger")
 {
+    using var scope = app.Services.CreateScope();
+    
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var retries = 10;
     for (var i = 0; i < retries; i++)
