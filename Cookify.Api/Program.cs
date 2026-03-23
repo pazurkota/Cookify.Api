@@ -11,10 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var isSwaggerRun = Assembly.GetEntryAssembly()?.GetName().Name == "dotnet-swagger";
-
 var jwtKey = builder.Configuration["Jwt:Key"] ??
-             (isSwaggerRun ? "swagger-placeholder-key-not-used-for-auth-00000000" : throw new InvalidOperationException("JWT key missing"));
+             throw new InvalidOperationException("JWT key missing");
 var key = Encoding.ASCII.GetBytes(jwtKey);
 
 // Add services to the container.
@@ -66,7 +64,9 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
-if (!isSwaggerRun)
+var entryAssembleName = Assembly.GetEntryAssembly()?.GetName().Name ?? string.Empty;
+
+if (entryAssembleName != "dotnet-swagger")
 {
     using var scope = app.Services.CreateScope();
     

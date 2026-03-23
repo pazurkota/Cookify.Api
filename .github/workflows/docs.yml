@@ -32,6 +32,8 @@ jobs:
 
       - name: Generate Swagger JSON
         run: swagger tofile --output swagger.json ./build-output/Cookify.Api.dll v1
+        env:
+          Jwt__Key: "swagger-docs-placeholder-key-not-used-for-auth-000"
 
       - name: Prepare Documentation Folder
         run: |
