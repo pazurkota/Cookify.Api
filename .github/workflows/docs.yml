@@ -1,0 +1,47 @@
+﻿name: docs
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Cookify.Api/Cookify.Api.csproj
+
+      - name: Publish project
+        run: dotnet publish Cookify.Api/Cookify.Api.csproj --configuration Release --no-restore --output ./build-output
+
+      - name: Install Swagger CLI
+        run: dotnet tool install --global Swashbuckle.AspNetCore.Cli --version 10.1.0
+
+      - name: Generate Swagger JSON
+        run: swagger tofile --output swagger.json ./build-output/Cookify.Api.dll v1
+
+      - name: Prepare Documentation Folder
+        run: |
+          mkdir public
+          cp swagger.json public/swagger.json
+          cp redoc-template/index.html public/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          force_orphan: true
