@@ -31,7 +31,7 @@ jobs:
         run: dotnet tool install --global Swashbuckle.AspNetCore.Cli --version 10.1.0
 
       - name: Generate Swagger JSON
-        run: swagger tofile --output swagger.json ./build-output/ParcelBox.Api.dll v1
+        run: swagger tofile --output swagger.json ./build-output/Cookify.Api.dll v1
 
       - name: Prepare Documentation Folder
         run: |

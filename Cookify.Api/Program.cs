@@ -21,7 +21,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "ParcelBox.Api.xml"));
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Cookify.Api.xml"));
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>

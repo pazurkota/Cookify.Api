@@ -17,7 +17,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: parcelbox_db
+          POSTGRES_DB: cookify_db
         ports:
           - 5432:5432
         options: >-
@@ -39,7 +39,7 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
       - name: Verify EF Core migrations
-        run: dotnet ef database update --project ParcelBox.Api
+        run: dotnet ef database update --project Cookify.Api
         env:
           ConnectionStrings__DefaultConnection: "Host=localhost;Database=cookify_db;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }}"
       - name: Test
