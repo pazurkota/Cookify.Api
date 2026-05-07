@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cookify.Api.Database;
 
-public class AppDbContext(DbContextOptions<AppDbContext> contextOptions) : IdentityDbContext(contextOptions)
+public class AppDbContext(DbContextOptions<AppDbContext> contextOptions) : IdentityDbContext(contextOptions), IAppDbContext
 {
     public DbSet<Recipe> Recipes { get; set; }
 
