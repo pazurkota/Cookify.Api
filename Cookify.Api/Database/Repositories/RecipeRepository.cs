@@ -3,41 +3,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cookify.Api.Database.Repositories;
 
-public class RecipeRepository(IAppDbContext context) : IRecipeRepository
+public class RecipeRepository(IAppDbContext context) : Repository<Recipe, int>(context)
 {
-    public async Task<IEnumerable<Recipe>> GetAllAsync()
-        => await context.Recipes.ToListAsync();
-
-    public async Task<Recipe?> GetByIdAsync(int id)
-        => await context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
-
-    public async Task<Recipe> CreateAsync(Recipe recipe)
+    public override async Task<Recipe?> UpdateAsync(int id, Recipe entity)
     {
-        context.Recipes.Add(recipe);
-        await context.SaveChangesAsync();
-        return recipe;
-    }
-
-    public async Task<Recipe?> UpdateAsync(int id, Recipe recipe)
-    {
-        var existing = await context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
+        var existing = await Context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
         if (existing is null) return null;
 
-        existing.Title = recipe.Title;
-        existing.Content = recipe.Content;
+        existing.Title = entity.Title;
+        existing.Content = entity.Content;
 
-        context.Recipes.Update(existing);
-        await context.SaveChangesAsync();
+        Context.Recipes.Update(existing);
+        await Context.SaveChangesAsync();
         return existing;
-    }
-
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var existing = await context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
-        if (existing is null) return false;
-
-        context.Recipes.Remove(existing);
-        await context.SaveChangesAsync();
-        return true;
     }
 }
