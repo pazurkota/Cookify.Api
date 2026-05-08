@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Cookify.Api.Database.Repositories;
+using Cookify.Api.Abstractions;
 using Cookify.Api.Dtos;
 using Cookify.Api.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -7,19 +7,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cookify.Api.Controllers;
 
-public class RecipeController(IRepository<Recipe, int> recipeRepository) : BaseController
+public class RecipeController(IRecipeRepository recipeRepository) : BaseController
 {
     /// <summary>
-    /// Get all recipes
+    /// Get all recipes (paginated)
     /// </summary>
-    /// <returns>List of all recipes</returns>
+    /// <param name="query">Page number and page size (max 100)</param>
+    /// <returns>Paged list of recipes</returns>
     [HttpGet]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAllRecipes()
+    public async Task<IActionResult> GetAllRecipes([FromQuery] RecipePageQuery query)
     {
-        var recipes = await recipeRepository.GetAllAsync();
-        return Ok(recipes);
+        var result = await recipeRepository.GetPagedAsync(query);
+        return Ok(result);
     }
 
     /// <summary>

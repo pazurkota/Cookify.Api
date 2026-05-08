@@ -64,7 +64,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
-builder.Services.AddScoped<IRepository<Recipe, int>, RecipeRepository>();
+builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+builder.Services.AddScoped<IRepository<Recipe, int>>(sp => sp.GetRequiredService<IRecipeRepository>());
 
 var app = builder.Build();
 
