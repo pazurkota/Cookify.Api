@@ -7,13 +7,13 @@ public abstract class Repository<T, TKey>(IAppDbContext context) : IRepository<T
 {
     protected readonly IAppDbContext Context = context;
 
-    public async Task<IEnumerable<T>> GetAllAsync()
+    public virtual async Task<IEnumerable<T>> GetAllAsync()
         => await Context.Set<T>().ToListAsync();
 
-    public async Task<T?> GetByIdAsync(TKey id)
+    public virtual async Task<T?> GetByIdAsync(TKey id)
         => await Context.Set<T>().FindAsync(id);
 
-    public async Task<T> CreateAsync(T entity)
+    public virtual async Task<T> CreateAsync(T entity)
     {
         Context.Set<T>().Add(entity);
         await Context.SaveChangesAsync();
