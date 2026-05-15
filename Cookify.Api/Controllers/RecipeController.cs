@@ -63,4 +63,62 @@ public class RecipeController(IRecipeRepository recipeRepository) : BaseControll
         var created = await recipeRepository.CreateAsync(recipe);
         return CreatedAtAction(nameof(CreateRecipe), new { id = created.Id }, created);
     }
+
+    /// <summary>
+    /// Update an existing recipe
+    /// </summary>
+    /// <param name="id">Recipe id</param>
+    /// <param name="dto">Recipe title and content</param>
+    /// <returns>The updated recipe</returns>
+    [HttpPut("{id:int}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> EditRecipe(int id, [FromBody] EditRecipeDto dto)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null) return Unauthorized();
+
+        var existing = await recipeRepository.GetByIdAsync(id);
+        if (existing is null) return NotFound();
+
+        if (existing.AuthorId != userId) return Forbid();
+
+        existing.Title = dto.Title;
+        existing.Content = dto.Content;
+
+        var updated = await recipeRepository.UpdateAsync(id, existing);
+        if (updated is null) return Forbid();
+
+        return Ok(updated);
+    }
+
+    /// <summary>
+    /// Delete a recipe
+    /// </summary>
+    /// <param name="id">Recipe id</param>
+    /// <returns></returns>
+    [HttpDelete("{id:int}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteRecipe(int id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null) return Unauthorized();
+
+        var existing = await recipeRepository.GetByIdAsync(id);
+        if (existing is null) return NotFound();
+
+        if (existing.AuthorId != userId) return Forbid();
+
+        var deleted = await recipeRepository.DeleteAsync(id);
+        if (!deleted) return Forbid();
+
+        return NoContent();
+    }
 }

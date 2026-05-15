@@ -43,6 +43,9 @@ public class RecipeRepository(IAppDbContext context) : Repository<Recipe, int>(c
         var existing = await Context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
         if (existing is null) return null;
 
+        // Ensure only the owner can update the recipe
+        if (existing.AuthorId != entity.AuthorId) return null;
+
         existing.Title = entity.Title;
         existing.Content = entity.Content;
 
