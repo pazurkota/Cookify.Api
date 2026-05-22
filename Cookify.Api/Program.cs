@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text;
 using Cookify.Api.Abstractions;
 using Cookify.Api.Database;
+using Cookify.Api.Database.Repositories;
 using Cookify.Api.Model;
 using Cookify.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -61,6 +62,10 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+builder.Services.AddScoped<IRepository<Recipe, int>>(sp => sp.GetRequiredService<IRecipeRepository>());
 
 var app = builder.Build();
 

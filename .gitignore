@@ -5,3 +5,5 @@ riderModule.iml
 /_ReSharper.Caches/
 .idea/
 /.env
+Cookify.Api/Cookify.Api.csproj.lscache
+Cookify.Api.Tests/Cookify.Api.Tests.csproj.lscache
